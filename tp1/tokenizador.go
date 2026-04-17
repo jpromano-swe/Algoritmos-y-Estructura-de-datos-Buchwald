@@ -1,13 +1,6 @@
 package main
 
-import (
-	"bufio"
-	"fmt"
-	"os"
-	"strings"
-	"tp1/tp1"
-	"unicode"
-)
+import "unicode"
 
 func esOperadorOParentesis(caracter string) bool {
 	switch caracter {
@@ -39,15 +32,4 @@ func tokenizar(linea string) []string {
 		}
 	}
 	return tokens
-}
-
-func main() {
-	scanner := bufio.NewScanner(os.Stdin)
-
-	for scanner.Scan() {
-		linea := scanner.Text()
-		tokens := tokenizar(linea)
-		resultado := tp1.InfijaAPosfija(tokens)
-		fmt.Println(strings.Join(resultado, " "))
-	}
 }
