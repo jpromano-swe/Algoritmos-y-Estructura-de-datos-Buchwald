@@ -2,7 +2,9 @@ package pila
 
 /* Definición del struct pila proporcionado por la cátedra. */
 
-const FactorDeCrecimiento = 2
+const _factorDeCrecimiento = 2
+const _capacidadInicial = 2
+const _factorDeReduccion = 4
 
 type pilaDinamica[T any] struct {
 	datos    []T
@@ -17,14 +19,11 @@ func CrearPilaDinamica[T any]() Pila[T] {
 }
 
 func (pila *pilaDinamica[T]) EstaVacia() bool {
-	if pila.cantidad == 0 {
-		return true
-	}
-	return false
+	return pila.cantidad == 0
 }
 
 func (pila *pilaDinamica[T]) VerTope() T {
-	if pila.cantidad == 0 {
+	if pila.EstaVacia() {
 		panic("La pila esta vacia")
 	}
 
@@ -32,35 +31,33 @@ func (pila *pilaDinamica[T]) VerTope() T {
 }
 
 func (pila *pilaDinamica[T]) Apilar(elemento T) {
-	pila.Redimensionar()
-
+	if len(pila.datos) == 0 {
+		pila.redimensionar(_capacidadInicial)
+	}
+	if pila.cantidad == len(pila.datos) {
+		pila.redimensionar(len(pila.datos) * _factorDeCrecimiento)
+	}
 	pila.datos[pila.cantidad] = elemento
-
 	pila.cantidad++
 }
 
 func (pila *pilaDinamica[T]) Desapilar() T {
-
-	if pila.cantidad == 0 {
+	if pila.EstaVacia() {
 		panic("La pila esta vacia")
 	}
 	pila.cantidad--
 
-	return pila.datos[pila.cantidad]
+	dato := pila.datos[pila.cantidad]
+
+	if !pila.EstaVacia() && pila.cantidad*_factorDeReduccion <= len(pila.datos) && len(pila.datos) > _capacidadInicial {
+		pila.redimensionar(len(pila.datos) / _factorDeCrecimiento)
+	}
+
+	return dato
 }
 
-func (pila *pilaDinamica[T]) Redimensionar() {
-	if pila.cantidad == len(pila.datos) {
-		nuevaCapacidad := len(pila.datos) * FactorDeCrecimiento
-		if nuevaCapacidad == 0 {
-			nuevaCapacidad = FactorDeCrecimiento
-		}
-
-		nuevosDatos := make([]T, nuevaCapacidad)
-
-		for i := 0; i < pila.cantidad; i++ {
-			nuevosDatos[i] = pila.datos[i]
-		}
-		pila.datos = nuevosDatos
-	}
+func (pila *pilaDinamica[T]) redimensionar(nuevaCapacidad int) {
+	nuevosDatos := make([]T, nuevaCapacidad)
+	copy(nuevosDatos, pila.datos[:pila.cantidad])
+	pila.datos = nuevosDatos
 }
